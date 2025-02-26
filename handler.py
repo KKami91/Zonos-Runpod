@@ -36,6 +36,8 @@ def audio_to_base64(audio_path):
     """Convert an audio file to base64 string"""
     with open(audio_path, "rb") as audio_file:
         encoded_string = base64.b64encode(audio_file.read())
+    # 바이너리 데이터를 base64로 인코딩한 결과는 항상 ASCII 문자만 포함하므로 
+    # ASCII로 디코딩해도 안전합니다. 하지만 호환성을 위해 'utf-8'을 유지합니다.
     return encoded_string.decode('utf-8')
 
 def handle_job(job):
@@ -66,28 +68,37 @@ def handle_job(job):
         speaker = model.make_speaker_embedding(wav, sampling_rate)
         
         # Optional parameters
-        speaking_rate = job_input.get("speaking_rate", 1.0)
-        pitch_variation = job_input.get("pitch_variation", 1.0)
-        max_frequency = job_input.get("max_frequency", 1.0)
-        audio_quality = job_input.get("audio_quality", 1.0)
-        emotion_happiness = job_input.get("emotion_happiness", 0.0)
-        emotion_anger = job_input.get("emotion_anger", 0.0)
-        emotion_sadness = job_input.get("emotion_sadness", 0.0)
-        emotion_fear = job_input.get("emotion_fear", 0.0)
+        speaking_rate = job_input.get("speaking_rate", 15.0)  # 기본값을 원본 함수와 맞춤
+        pitch_std = job_input.get("pitch_std", 20.0)  # pitch_variation 대신 pitch_std 사용
+        fmax = job_input.get("fmax", 22050.0)  # max_frequency 대신 fmax 사용
         
-        # Create conditioning dictionary with all parameters
+        # 감정 관련 파라미터 (전체 8개 감정 중 4개만 사용자 정의)
+        # 기본 감정 배열 [0.3077, 0.0256, 0.0256, 0.0256, 0.0256, 0.0256, 0.2564, 0.3077]
+        emotion = [0.0256] * 8  # 기본값
+        emotion_idx = {
+            "happiness": 0,
+            "anger": 2,
+            "sadness": 6,
+            "fear": 7
+        }
+        
+        # 사용자 정의 감정 값 적용
+        emotion[emotion_idx["happiness"]] = job_input.get("emotion_happiness", 0.0256)
+        emotion[emotion_idx["anger"]] = job_input.get("emotion_anger", 0.0256)
+        emotion[emotion_idx["sadness"]] = job_input.get("emotion_sadness", 0.0256)
+        emotion[emotion_idx["fear"]] = job_input.get("emotion_fear", 0.0256)
+        
+        # audio_quality 매개변수 사용하지 않음 (Zonos에 없음)
+        
+        # Create conditioning dictionary with correct parameters
         cond_dict = make_cond_dict(
             text=text, 
             speaker=speaker, 
             language=language,
             speaking_rate=speaking_rate,
-            pitch_variation=pitch_variation,
-            max_frequency=max_frequency,
-            audio_quality=audio_quality,
-            emotion_happiness=emotion_happiness,
-            emotion_anger=emotion_anger,
-            emotion_sadness=emotion_sadness,
-            emotion_fear=emotion_fear
+            pitch_std=pitch_std,
+            fmax=fmax,
+            emotion=emotion
         )
         
         conditioning = model.prepare_conditioning(cond_dict)
