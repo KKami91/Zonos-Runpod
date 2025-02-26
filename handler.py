@@ -113,7 +113,7 @@ def handle_job(job):
         output_path = tempfile.NamedTemporaryFile(delete=False, suffix='.wav').name
         torchaudio.save(output_path, wavs[0], model.autoencoder.sampling_rate)
         
-        # Convert to base64
+        # Convert to base64...
         audio_base64 = audio_to_base64(output_path)
         
         # Clean up
