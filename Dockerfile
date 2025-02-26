@@ -13,7 +13,7 @@ RUN pip install --upgrade pip && \
 WORKDIR /app
 
 # Clone Zonos repository
-RUN git clone https://github.com/Zyphra/Zonos.git /app && \
+RUN git clone https://github.com/KKami91/Zonos-Runpod.git /app && \
     cd /app
 
 # Install Zonos and its dependencies
