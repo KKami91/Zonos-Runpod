@@ -13,12 +13,15 @@ from zonos.utils import DEFAULT_DEVICE as device
 # Global variables
 model = None
 
-def initialize_model():
+def initialize_model(model_type: str):
+    # transformer or hybrid
     global model
     if model is None:
         # Choose between transformer or hybrid model
-        # model = Zonos.from_pretrained("Zyphra/Zonos-v0.1-hybrid", device=device)
-        model = Zonos.from_pretrained("Zyphra/Zonos-v0.1-transformer", device=device)
+        if model_type == "hybrid":
+            model = Zonos.from_pretrained("Zyphra/Zonos-v0.1-hybrid", device=device)
+        elif model_type == "transformer":
+            model = Zonos.from_pretrained("Zyphra/Zonos-v0.1-transformer", device=device)
     return model
 
 def decode_base64_to_audio(base64_string):
@@ -45,8 +48,10 @@ def handle_job(job):
     job_input = job["input"]
     
     try:
+        # 기본 transformer
+        model_types = job_input.get("model_type", "transformer")
         # Initialize model if not already done
-        model = initialize_model()
+        model = initialize_model(model_type=model_types)
         
         # Extract parameters from the job input
         text = job_input.get("text", "Hello, world!")
