@@ -69,26 +69,48 @@ def handle_job(job):
         
         # Optional parameters
         speaking_rate = job_input.get("speaking_rate", 15.0)  # 기본값을 원본 함수와 맞춤
-        pitch_std = job_input.get("pitch_std", 20.0)  # pitch_variation 대신 pitch_std 사용
-        fmax = job_input.get("fmax", 22050.0)  # max_frequency 대신 fmax 사용
+        pitch_std = job_input.get("pitch_std", 20.0)
+        fmax = job_input.get("fmax", 22050.0)
         
         # 감정 관련 파라미터 (전체 8개 감정 중 4개만 사용자 정의)
         # 기본 감정 배열 [0.3077, 0.0256, 0.0256, 0.0256, 0.0256, 0.0256, 0.2564, 0.3077]
-        emotion = [0.0256] * 8  # 기본값
+        # emotion = [0.0256] * 8  # 기본값
+        # emotion_idx = {
+        #     "happiness": 0,
+        #     "anger": 2,
+        #     "sadness": 6,
+        #     "fear": 7
+        # }
+        
+        # # 사용자 정의 감정 값 적용
+        # emotion[emotion_idx["happiness"]] = job_input.get("emotion_happiness", 0.0256)
+        # emotion[emotion_idx["anger"]] = job_input.get("emotion_anger", 0.0256)
+        # emotion[emotion_idx["sadness"]] = job_input.get("emotion_sadness", 0.0256)
+        # emotion[emotion_idx["fear"]] = job_input.get("emotion_fear", 0.0256)
+
+
+        # 기본 감정 배열 [0.3077, 0.0256, 0.0256, 0.0256, 0.0256, 0.0256, 0.2564, 0.3077]
+        # 감정 리스트 [Happiness, Sadness, Disgust, Fear, Suprise, Anger, Other, Neutral]
+        emotion = [0.3077, 0.0256, 0.0256, 0.0256, 0.0256, 0.0256, 0.2564, 0.3077]
         emotion_idx = {
-            "happiness": 0,
-            "anger": 2,
-            "sadness": 6,
-            "fear": 7
+            "Happiness": 0,
+            "Sadness": 1,
+            "Disgust": 2,
+            "Fear": 3,
+            "Suprise": 4,
+            "Anger": 5,
+            "Other": 6,
+            "Neutral": 7
         }
-        
-        # 사용자 정의 감정 값 적용
-        emotion[emotion_idx["happiness"]] = job_input.get("emotion_happiness", 0.0256)
-        emotion[emotion_idx["anger"]] = job_input.get("emotion_anger", 0.0256)
-        emotion[emotion_idx["sadness"]] = job_input.get("emotion_sadness", 0.0256)
-        emotion[emotion_idx["fear"]] = job_input.get("emotion_fear", 0.0256)
-        
-        # audio_quality 매개변수 사용하지 않음 (Zonos에 없음)
+
+        emotion[emotion_idx["Happiness"]] = job_input.get("emotion_happiness", 0.3077)
+        emotion[emotion_idx["Sadness"]] = job_input.get("emotion_sadness", 0.0256)
+        emotion[emotion_idx["Disgust"]] = job_input.get("emotion_disgust", 0.0256)
+        emotion[emotion_idx["Fear"]] = job_input.get("emotion_fear", 0.0256)
+        emotion[emotion_idx["Suprise"]] = job_input.get("emotion_suprise", 0.0256)
+        emotion[emotion_idx["Anger"]] = job_input.get("emotion_anger", 0.0256)
+        emotion[emotion_idx["Other"]] = job_input.get("emotion_other", 0.2564)
+        emotion[emotion_idx["Neutral"]] = job_input.get("emotion_neutral", 0.3077)
         
         # Create conditioning dictionary with correct parameters
         cond_dict = make_cond_dict(
