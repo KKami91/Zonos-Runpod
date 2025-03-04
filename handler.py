@@ -17,6 +17,12 @@ def initialize_model(model_type: str):
     # transformer or hybrid
     global model
     if model is None:
+        # # 시드 고정을 위한 설정
+        # torch.manual_seed(443)
+        # torch.cuda.manual_seed(443)
+        # torch.backends.cudnn.deterministic = True
+        # torch.backends.cudnn.benchmark = False
+        
         # Choose between transformer or hybrid model
         if model_type == "hybrid":
             model = Zonos.from_pretrained("Zyphra/Zonos-v0.1-hybrid", device=device)
@@ -122,6 +128,7 @@ def handle_job(job):
         vqscore_input = job_input.get("vqscore_8", [0.78] * 8)
         ctc_loss_input = job_input.get("ctc_loss", 0.0)
         dnsmos_ovrl_input = job_input.get("dnsmos_ovrl", 4.0)
+        speaker_noised_input = job_input.get("speaker_noised", False)
         
         # Create conditioning dictionary with correct parameters
         cond_dict = make_cond_dict(
@@ -135,6 +142,7 @@ def handle_job(job):
             vqscore_8=vqscore_input,
             ctc_loss=ctc_loss_input,
             dnsmos_ovrl=dnsmos_ovrl_input,
+            speaker_noised=speaker_noised_input
         )
         
         conditioning = model.prepare_conditioning(cond_dict)
