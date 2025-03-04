@@ -116,6 +116,12 @@ def handle_job(job):
         emotion[emotion_idx["Anger"]] = job_input.get("emotion_anger", 0.0256)
         emotion[emotion_idx["Other"]] = job_input.get("emotion_other", 0.2564)
         emotion[emotion_idx["Neutral"]] = job_input.get("emotion_neutral", 0.3077)
+
+
+        # 추가 parameters
+        vqscore_input = job_input.get("vqscore_8", [0.78] * 8)
+        ctc_loss_input = job_input.get("ctc_loss", 0.0)
+        dnsmos_ovrl_input = job_input.get("dnsmos_ovrl", 4.0)
         
         # Create conditioning dictionary with correct parameters
         cond_dict = make_cond_dict(
@@ -125,7 +131,10 @@ def handle_job(job):
             speaking_rate=speaking_rate,
             pitch_std=pitch_std,
             fmax=fmax,
-            emotion=emotion
+            emotion=emotion,
+            vqscore_8=vqscore_input,
+            ctc_loss=ctc_loss_input,
+            dnsmos_ovrl=dnsmos_ovrl_input,
         )
         
         conditioning = model.prepare_conditioning(cond_dict)
